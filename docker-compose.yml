@@ -1,0 +1,42 @@
+version: "3"
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin4
+  redis:
+    image: "redis:latest"
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "3000:80"
+  backend:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./juzgodigital-backend
+    volumes:
+      - /app/node_modules
+      - ./juzgodigital-backend:/app
+    depends_on:
+      - postgres
+  frontend:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./juzgodigital-frontend
+    volumes:
+      - /app/node_modules
+      - ./juzgodigital-frontend:/app
